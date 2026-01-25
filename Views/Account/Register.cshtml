@@ -1,0 +1,81 @@
+﻿@model OfficeMaster.ViewModels.Auth.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Registration";
+}
+
+<style>
+    .custom-input::placeholder {
+        color: var(--color-text-body);
+        opacity: 0.5;
+    }
+</style>
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card shadow-lg border-0 rounded-4" style="background-color: var(--bg-secondary);">
+            <div class="card-body p-5">
+                
+                <h2 class="text-center fw-bold mb-4" style="color: var(--color-text-title);">Register</h2>
+                
+                <form asp-action="Register" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label asp-for="FirstName" class="form-label" style="color: var(--color-text-body);">First Name</label>
+                            <input asp-for="FirstName" class="form-control" placeholder="John" />
+                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                        </div>
+                        <div class="col-6">
+                            <label asp-for="LastName" class="form-label" style="color: var(--color-text-body);">Last Name</label>
+                            <input asp-for="LastName" class="form-control" placeholder="Doe" />
+                            <span asp-validation-for="LastName" class="text-danger"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label" style="color: var(--color-text-body);">Email</label>
+                        <input asp-for="Email" class="form-control" placeholder="name@example.com" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label asp-for="CompanyName" class="form-label" style="color: var(--color-text-body);">Company Name</label>
+                        <input asp-for="CompanyName" class="form-control" placeholder="Optional" />
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label asp-for="DateOfBirth" class="form-label" style="color: var(--color-text-body);">Date of Birth</label>
+                        <input asp-for="DateOfBirth" class="form-control" />
+                        <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label" style="color: var(--color-text-body);">Password</label>
+                        <input asp-for="Password" class="form-control" placeholder="••••••" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="ConfirmPassword" class="form-label" style="color: var(--color-text-body);">Confirm Password</label>
+                        <input asp-for="ConfirmPassword" class="form-control" placeholder="••••••" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 fw-bold mb-4">
+                        Create Account
+                    </button>
+                    
+                    <div class="text-center">
+                        <span style="color: var(--color-text-body); opacity: 0.7;">Already have an account?</span>
+                        <a asp-controller="Account" asp-action="Login" class="fw-bold text-decoration-none ms-1"
+                           style="color: var(--color-text-title);">
+                            Back to Login
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

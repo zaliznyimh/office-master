@@ -38,6 +38,9 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<long>, 
             b.Property(r => r.Name).IsRequired().HasMaxLength(100);
             b.Property(r => r.Description).HasMaxLength(500);
             b.Property(r => r.ImageUrl).HasMaxLength(200);
+            b.Property(r => r.RoomType)
+                .HasConversion<string>()
+                .HasMaxLength(20);
             
             b.Property(r => r.PricePerHour).HasColumnType("decimal(18,2)"); 
             

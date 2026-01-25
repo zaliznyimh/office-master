@@ -1,8 +1,69 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Welcome";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="text-center pt-5 pb-3">
+    <h1 class="display-3 fw-bold" style="color: var(--color-text-title);">
+        Welcome to <span style="color: var(--color-action-primary);">OfficeMaster</span>
+    </h1>
+    <p class="lead mt-2" style="color: #bbb; max-width: 700px; margin: 0 auto;">
+        Your space for productivity. Comfort, style, and focus start here.
+    </p>
+</div>
+
+<div class="container my-5">
+    <div class="row align-items-center mb-5 gx-5">
+        <div class="col-md-6 mb-4 mb-md-0">
+            <img src="https://images.unsplash.com/photo-1582653291997-079a1c04e5a1?q=80&w=1740&auto=format&fit=crop"
+                 class="img-fluid rounded-4 shadow-lg feature-img" alt="Meeting Room">
+        </div>
+        <div class="col-md-6">
+            <h2 class="display-6 fw-bold mb-3" style="color: var(--color-text-title);">Meeting Rooms</h2>
+            <p class="lead" style="color: #bbb">
+                Perfect silence for crucial decisions. Our meeting rooms are equipped with high-speed Wi-Fi, 
+                whiteboards, and projectors. Ideal for client meetings and brainstorming sessions.
+            </p>
+        </div>
+    </div>
+
+    <hr style="border-color: var(--bg-secondary); opacity: 0.5;" />
+
+    <div class="row align-items-center my-5 gx-5">
+        <div class="col-md-6 order-2 order-md-1">
+            <h2 class="display-6 fw-bold mb-3" style="color: var(--color-text-title);">Conference Halls</h2>
+            <p class="lead" style="color: #bbb;">
+                Planning a big event? Our spacious halls can accommodate up to 200 people. 
+                Premium sound systems, variable lighting, and catering support for your training sessions and presentations.
+            </p>
+        </div>
+        <div class="col-md-6 order-1 order-md-2 mb-4 mb-md-0">
+            <img src="https://www.m-messe.co.jp/static/images/guide/thumb_conference_03.jpg" 
+                 class="img-fluid rounded-4 shadow-lg feature-img" alt="Conference Hall">
+        </div>
+    </div>
+
+    <hr style="border-color: var(--bg-secondary); opacity: 0.5;" />
+
+    <div class="row align-items-center my-5 gx-5">
+        <div class="col-md-6 mb-4 mb-md-0">
+            <img src="https://sken.pl/wp-content/uploads/2025/09/sprzatanie-open-space.jpg" 
+                 class="img-fluid rounded-4 shadow-lg feature-img" alt="Open Space">
+        </div>
+        <div class="col-md-6">
+            <h2 class="display-6 fw-bold mb-3" style="color: var(--color-text-title);">Open Space</h2>
+            <p class="lead" style="color: #bbb;">
+                Join a vibrant community. Co-working desks in a modern open space environment. 
+                Network with other professionals while enjoying free coffee and ergonomic furniture.
+            </p>
+        </div>
+    </div>
+
+    <div class="cta-box text-center p-5 mt-5 rounded-4 shadow">
+        <p class="fs-4 mb-4" style="color: var(--color-text-title);">
+            Secure your perfect workspace today and boost your productivity.
+        </p>
+        <a asp-controller="Rooms" asp-action="Index" class="btn btn-primary btn-lg px-5 py-3 fw-bold">
+            Book Workspace Now
+        </a>
+    </div>
 </div>
