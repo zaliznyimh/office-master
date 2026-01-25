@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using OfficeMaster.Models.Enum;
 
 namespace OfficeMaster.Models;
 
@@ -17,6 +18,7 @@ public class ConferenceRoom : BaseEntity
     [DataType(DataType.Currency)]
     public decimal PricePerHour { get; set; }
     
+    public RoomType RoomType { get; set; }
     public string? ImageUrl { get; set; }
     
     public List<Reservation> Reservations { get; set; } = new();

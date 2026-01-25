@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using OfficeMaster.Models.Enum;
 
 namespace OfficeMaster.Models;
 

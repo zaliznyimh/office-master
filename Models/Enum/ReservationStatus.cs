@@ -1,4 +1,4 @@
-﻿namespace OfficeMaster.Models;
+﻿namespace OfficeMaster.Models.Enum;
 
 public enum ReservationStatus
 {
