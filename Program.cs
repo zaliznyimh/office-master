@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OfficeMaster.Data;
+using OfficeMaster.Interface;
 using OfficeMaster.Models;
+using OfficeMaster.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +11,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-builder.Services.AddIdentity<User, IdentityRole<long>>(options => 
+builder.Services.AddIdentity<User, IdentityRole<long>>(options =>
     {
         options.Password.RequireDigit = false;
         options.Password.RequireLowercase = false;
@@ -21,7 +23,15 @@ builder.Services.AddIdentity<User, IdentityRole<long>>(options =>
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Account/Login";
+    options.AccessDeniedPath = "/Account/AccessDenied"; 
+});
+
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddScoped<IConferenceRoomService, ConferenceRoomService>();
 
 var app = builder.Build();
 
