@@ -6,15 +6,14 @@
 
 <div class="container mt-4">
     <form asp-action="Index" method="get" id="filterForm">
-        
+
         <div class="row mb-4">
             <div class="col-12">
                 <div class="input-group">
-                    <input type="text" name="search" class="form-control p-3 border-0" 
-                           placeholder="Search rooms by name or description..." 
-                           value="@ViewBag.CurrentSearch"
-                           style="background-color: var(--bg-secondary); color: var(--color-text-title); border-radius: 12px 0 0 12px;">
-                    <button type="submit" class="btn btn-primary px-4" style="border-radius: 0 12px 12px 0;">
+                    <input type="text" name="search" class="form-control p-3 border-0"
+                           placeholder="Search rooms by name"
+                           value="@ViewBag.CurrentSearch">
+                    <button type="submit" class="btn btn-primary px-4">
                         Search
                     </button>
                 </div>
@@ -24,84 +23,51 @@
         <div class="row">
             <div class="col-md-9">
                 <div class="row g-4">
-                    @if (!Model.Any())
-                    {
-                        <div class="text-center py-5">
-                            <h4 style="color: var(--color-text-body);">No rooms match your filters </h4>
-                            <p style="color: var(--color-text-body); opacity: 0.7;">Try change capacity range or removing some filters.</p>
-                        </div>
-                    }
-
-                    @foreach (var room in Model)
-                    {
-                        <div class="col-md-6 col-lg-4">
-                            <div class="card h-100 border-0 shadow-sm" 
-                                 style="background-color: var(--bg-secondary); border-radius: 16px; overflow: hidden; transition: transform 0.2s;">
-                                
-                                <div style="height: 180px; background-color: #2a2d45; overflow: hidden; position: relative;">
-                                    @if (!string.IsNullOrEmpty(room.ImageUrl))
-                                    {
-                                        <img src="@room.ImageUrl" alt="@room.Name" style="width: 100%; height: 100%; object-fit: cover;">
-                                    }
-                                    else
-                                    {
-                                        // TODO: Implement image for non image rooms
-                                    }
-                                    
-                                    <span class="badge position-absolute top-0 end-0 m-3" 
-                                          style="background-color: rgba(0,0,0,0.6); backdrop-filter: blur(4px);">
-                                        @room.RoomType
-                                    </span>
-                                </div>
-
-                                <div class="card-body d-flex flex-column">
-                                    <h5 class="fw-bold mb-1" style="color: var(--color-text-title);">@room.Name</h5>
-                                    
-                                    @if (!string.IsNullOrEmpty(room.Description))
-                                    {
-                                        <p class="small text-truncate" style="color: var(--color-text-body); opacity: 0.8;">@room.Description</p>
-                                    }
-
-                                    <div class="mb-3 small" style="color: var(--color-text-body);">
-                                        <span> @room.Capacity ppl</span>
-                                        <span class="mx-2">•</span>
-                                        <span> @room.PricePerHour $ h</span>
-                                    </div>
-                                    
-                                    <div class="mb-3">
-                                        @if (room.HasProjector)
-                                        {
-                                            <span class="badge me-1 fw-normal" style="background-color: var(--bg-main); color: var(--color-text-body); border: 1px solid var(--color-action-sub);">
-                                                Projector
-                                            </span>
-                                        }
-                                    </div>
-
-                                    <a href="#" class="btn btn-primary w-100 mt-auto fw-bold">
-                                        Book Now
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    }
+                    <partial name="_RoomList" model="Model"/>
                 </div>
             </div>
 
             <div class="col-md-3">
-                <div class="p-4 rounded-4 sticky-top" style="background-color: var(--bg-secondary); top: 20px; z-index: 100;">
+                <div class="p-4 rounded-4 sticky-top"
+                     style="background-color: var(--bg-secondary); top: 20px; z-index: 100;">
                     <h5 class="fw-bold mb-4" style="color: var(--color-text-title);">Filters</h5>
-                    
+
+                    <div class="mb-4">
+                        <label class="form-label mb-2" style="color: var(--color-text-body);">Check Availability</label>
+
+                        <div class="mb-2">
+                            <label class="small">From</label>
+                            <input type="datetime-local" id="startDate" name="startDate" class="form-control"
+                                   value="@ViewBag.StartDate"
+                                   style="background-color: var(--bg-main); color: var(--color-text-title); border: 1px solid var(--color-action-sub);">
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="small">To</label>
+                            <input type="datetime-local" id="endDate" name="endDate" class="form-control"
+                                   value="@ViewBag.EndDate"
+                                   style="background-color: var(--bg-main); color: var(--color-text-title); border: 1px solid var(--color-action-sub);">
+                        </div>
+
+                        <div id="dateError" class="alert alert-danger mt-2 py-2 small"
+                             style="display: none; background-color: #3e1a1a; border-color: #ff4d4d; color: #ffcccc;">
+                            Please, choose correct date
+                        </div>
+                    </div>
+
+                    <hr style="border-color: var(--color-action-sub); opacity: 0.3;">
+
                     <div class="mb-4">
                         <label class="form-label mb-2" style="color: var(--color-text-body);">Capacity (people)</label>
                         <div class="d-flex align-items-center gap-2">
-                            <input type="number" name="minCapacity" class="form-control text-center" 
+                            <input type="number" name="minCapacity" class="form-control text-center"
                                    placeholder="Min" min="1"
                                    value="@ViewBag.MinCapacity"
                                    style="background-color: var(--bg-main); color: var(--color-text-title); border: 1px solid var(--color-action-sub);">
-                            
+
                             <span style="color: var(--color-text-body); opacity: 0.5;">-</span>
-                            
-                            <input type="number" name="maxCapacity" class="form-control text-center" 
+
+                            <input type="number" name="maxCapacity" class="form-control text-center"
                                    placeholder="Max" min="1"
                                    value="@ViewBag.MaxCapacity"
                                    style="background-color: var(--bg-main); color: var(--color-text-title); border: 1px solid var(--color-action-sub);">
@@ -110,7 +76,7 @@
 
                     <div class="mb-4">
                         <label class="form-label mb-2" style="color: var(--color-text-body);">Room Type</label>
-                        <select name="type" class="form-select border-0" 
+                        <select name="type" class="form-select border-0"
                                 asp-items="Html.GetEnumSelectList<OfficeMaster.Models.Enum.RoomType>()"
                                 style="background-color: var(--bg-main); color: var(--color-text-title); border: 1px solid var(--color-action-sub);">
                             <option value="">All Types</option>
@@ -119,19 +85,21 @@
 
                     <div class="mb-4">
                         <label class="form-label mb-2" style="color: var(--color-text-body);">Facilities</label>
-                        
+
                         <div class="form-check mb-2">
-                            <input class="form-check-input custom-check" type="checkbox" name="hasProjector" value="true" id="tagPro"
+                            <input class="form-check-input conference-room-checkbox" type="checkbox" name="hasProjector"
+                                   value="true" id="tagPro"
                                    @(ViewBag.CurrentProjector == true ? "checked" : "")>
                             <label class="form-check-label" for="tagPro" style="color: var(--color-text-body);">Projector</label>
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100 mb-2 fw-bold">
-                        Apply Filters
+                    <button type="submit" id="applyFiltersBtn" class="btn btn-primary w-100 mb-2 fw-bold">
+                        Check Availability
                     </button>
-                    
-                    <a asp-action="Index" class="btn w-100" style="border: 1px solid var(--color-action-sub); color: var(--color-text-body);">
+
+                    <a asp-action="Index" class="btn w-100"
+                       style="border: 1px solid var(--color-action-sub); color: var(--color-text-body);">
                         Reset
                     </a>
                 </div>
@@ -140,26 +108,74 @@
     </form>
 </div>
 
-<style>
-    .custom-check {
-        background-color: var(--bg-main);
-        border-color: var(--color-action-sub);
-        cursor: pointer;
-    }
-    .custom-check:checked {
-        background-color: var(--color-action-primary);
-        border-color: var(--color-action-primary);
-        box-shadow: none;
-    }
-    
-    .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.3) !important;
-    }
-    
-    input[type=number]::-webkit-inner-spin-button, 
-    input[type=number]::-webkit-outer-spin-button { 
-        -webkit-appearance: none; 
-        margin: 0; 
-    }
-</style>
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const startInput = document.getElementById('startDate');
+            const endInput = document.getElementById('endDate');
+            const applyBtn = document.getElementById('applyFiltersBtn');
+            const errorBox = document.getElementById('dateError');
+            const roomCards = document.querySelectorAll('.room-card');
+
+            function updateUI() {
+                const startStr = startInput.value;
+                const endStr = endInput.value;
+
+                startInput.style.borderColor = 'var(--color-action-sub)';
+                endInput.style.borderColor = 'var(--color-action-sub)';
+                errorBox.style.display = 'none';
+                applyBtn.disabled = false;
+
+                if (!startStr || !endStr) {
+                    resetPrices();
+                    return;
+                }
+
+                const startDate = new Date(startStr);
+                const endDate = new Date(endStr);
+
+                if (endDate <= startDate) {
+                    endInput.style.borderColor = '#ff4d4d';
+                    errorBox.style.display = 'block';
+                    applyBtn.disabled = true;
+                    resetPrices();
+                    return;
+                }
+
+                const diffHours = Math.abs(endDate - startDate) / 36e5;
+                const hours = Math.round(diffHours * 10) / 10;
+
+                if (hours > 0) {
+                    updatePrices(hours);
+                }
+            }
+
+            function updatePrices(hours) {
+                roomCards.forEach(card => {
+                    const pricePerHour = parseFloat(card.getAttribute('data-price-per-hour').replace(',', '.'));
+                    const totalPrice = (pricePerHour * hours).toFixed(2);
+
+                    const priceBadge = card.querySelector('.price-badge');
+
+                    priceBadge.innerHTML = `Total: $${totalPrice} <span style="font-size:0.8em; opacity:0.8">(${hours}h)</span>`;
+                    priceBadge.style.color = '#4ade80';
+                });
+            }
+
+            function resetPrices() {
+                roomCards.forEach(card => {
+                    const pricePerHour = parseFloat(card.getAttribute('data-price-per-hour').replace(',', '.'));
+                    const priceBadge = card.querySelector('.price-badge');
+
+                    priceBadge.innerHTML = `$${pricePerHour}/h`;
+                    priceBadge.style.color = 'var(--color-action-primary)';
+                });
+            }
+
+            startInput.addEventListener('change', updateUI);
+            endInput.addEventListener('change', updateUI);
+
+            updateUI();
+        });
+    </script>
+}

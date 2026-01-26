@@ -3,6 +3,8 @@ using OfficeMaster.Data;
 using OfficeMaster.Interface;
 using OfficeMaster.Models;
 using OfficeMaster.Models.Enum;
+using OfficeMaster.ViewModels.Rooms;
+using OfficeMaster.ViewModels.Shared;
 
 namespace OfficeMaster.Service;
 
@@ -15,7 +17,8 @@ public class ConferenceRoomService : IConferenceRoomService
         _context = context;
     }
     
-    public async Task<List<ConferenceRoom>> GetRoomsAsync(string? search, int? minCapacity, int? maxCapacity, RoomType? type, bool? hasProjector)
+    public async Task<List<ConferenceRoom>> GetRoomsAsync(string? search, int? minCapacity, int? maxCapacity, RoomType? type, bool? hasProjector, DateTime? startDate,
+        DateTime? endDate)
     {
         var query = _context.ConferenceRooms.AsQueryable();
         
@@ -34,7 +37,82 @@ public class ConferenceRoomService : IConferenceRoomService
         {
             query = query.Where(r => r.HasProjector == true);
         }
+
+        if (type.HasValue)
+        {
+            query = query.Where(r => r.RoomType == type.Value);
+        }
         
+        if (startDate.HasValue && endDate.HasValue)
+        {
+            var utcStartDate = startDate.Value.ToUniversalTime();
+            var utcEndDate = endDate.Value.ToUniversalTime();
+            
+            query = query.Where(room => !room.Reservations.Any(r => 
+                utcStartDate < r.EndTime && utcEndDate > r.StartTime &&
+                r.Status != ReservationStatus.Cancelled
+            ));
+        }
+            
         return await query.ToListAsync();
+    }
+
+    public async Task<ConferenceRoom?> GetRoomByIdAsync(long id)
+    {
+        return await _context.ConferenceRooms
+            .Include(r => r.Reservations)
+            .FirstOrDefaultAsync(r => r.Id == id);
+    }
+
+    public async Task<bool> IsRoomAvailableAsync(long roomId, DateTime start, DateTime end)
+    {
+        var startDate = start.ToUniversalTime();
+        var endDate = end.ToUniversalTime();
+        
+        var overlappingReservations = await _context.Reservations
+            .Where(r => r.ConferenceRoomId == roomId)
+            .Where(r => r.StartTime < endDate && r.EndTime > startDate)
+            .ToListAsync();
+        
+        bool isTaken = overlappingReservations.Any(r => r.Status == ReservationStatus.Pending);
+
+        return !isTaken;
+    }
+
+    public async Task<bool> BookRoomAsync(ConferenceRoom room, long userId, RoomDetailsViewModel model)
+    {
+        var duration = (model.EndTime - model.StartTime).TotalHours;
+        var totalPrice = (decimal)duration * room.PricePerHour;
+
+        var reservation = new Reservation
+        {
+            ConferenceRoomId = room.Id,
+            UserId = userId,
+            StartTime = model.StartTime.ToUniversalTime(),
+            EndTime = model.EndTime.ToUniversalTime(),
+            TotalPrice = totalPrice,
+            Status = ReservationStatus.Pending
+        };
+
+        _context.Reservations.Add(reservation);
+        await _context.SaveChangesAsync();
+
+        return true;
+    }
+
+    public async Task<List<CalendarResponse>> GetConferenceRoomCalendar(long roomId)
+    {
+        var events = await _context.Reservations
+            .Where(r => r.ConferenceRoomId == roomId)
+            .Where(r => r.Status == ReservationStatus.Approved)
+            .Select(r => new CalendarResponse
+            {
+                Title = "Booked",
+                Start = r.StartTime,
+                End = r.EndTime
+            })
+            .ToListAsync();
+
+        return events;
     }
 }
