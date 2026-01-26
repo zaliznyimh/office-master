@@ -61,6 +61,19 @@ public class AccountController : Controller
         
         return View(model);
     }
+
+    [HttpGet]
+    public async Task<IActionResult> CheckEmailAvailability(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return Json(new { isTaken = false });
+        }
+
+        var user = await _userManager.FindByEmailAsync(email);
+        
+        return Json(new {isTaken = user!=null});
+    }
     
     [HttpGet]
     public IActionResult Login()
@@ -71,6 +84,11 @@ public class AccountController : Controller
     [HttpPost]
     public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl = null)
     {
+        if (returnUrl is null)
+        {
+            returnUrl = "/ConferenceRoom";
+        }
+
         if (ModelState.IsValid)
         {
             var result = await _signInManager.PasswordSignInAsync(
