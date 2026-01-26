@@ -1,0 +1,145 @@
+﻿@model OfficeMaster.ViewModels.Profile.ProfileViewModel
+
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="container mt-5">
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success border-0 rounded-4 mb-4"
+             style="background-color: #1a3e34; color: #a3e6cd;">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-lg-4 mb-5">
+            <div class="card border-0 shadow-lg rounded-4 sticky-top"
+                 style="background-color: var(--bg-secondary); top: 20px;">
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <h4 class="fw-bold mb-1"
+                            style="color: var(--color-text-title);">@Model.FirstName @Model.LastName</h4>
+                        <p class="small" style="color: var(--color-text-body);">@Model.Email</p>
+                    </div>
+
+                    <form asp-action="Update" method="post">
+                        <div class="mb-3">
+                            <label class="form-label small" style="color: var(--color-text-title)">First Name</label>
+                            <input asp-for="FirstName" class="form-control form-dark"/>
+                            <span asp-validation-for="FirstName" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small" style="color: var(--color-text-title)">Last Name</label>
+                            <input asp-for="LastName" class="form-control form-dark"/>
+                            <span asp-validation-for="LastName" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-3"> 
+                            <label class="form-label small" style="color: var(--color-text-title)">Email</label>
+                            <input asp-for="Email" class="form-control form-dark"/>
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small" style="color: var(--color-text-title)">Company</label>
+                            <input asp-for="CompanyName" class="form-control form-dark"/>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label small" style="color: var(--color-text-title)">Date of Birth</label>
+                            <input asp-for="DateOfBirth" type="date" class="form-control form-dark"
+                                   style="color-scheme: dark;">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 fw-bold">
+                            Save Changes
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <h3 class="fw-bold mb-4" style="color: var(--color-text-title);">My Bookings</h3>
+
+            @if (!Model.MyReservations.Any())
+            {
+                <div class="text-center py-5 rounded-4" style="border: 2px dashed var(--color-action-sub);">
+                    <h5 style="color: var(--color-text-body);">No bookings yet</h5>
+                    <a asp-controller="ConferenceRoom" asp-action="Index"
+                       class="btn btn-link text-decoration-none fw-bold"
+                       style="color: var(--color-action-primary);">
+                        Find a room
+                    </a>
+                </div>
+            }
+
+            <div class="d-flex flex-column gap-3">
+                @foreach (var booking in Model.MyReservations)
+                {
+                    bool isPast = booking.EndTime < DateTime.UtcNow;
+                    string opacity = isPast ? "0.6" : "1";
+                    
+                    string statusClass = "";
+                    string label = booking.Status.ToString();
+
+                    switch (booking.Status)
+                    {
+                        case OfficeMaster.Models.Enum.ReservationStatus.Approved:
+                            statusClass = "outline-success";
+                            break;
+                        case OfficeMaster.Models.Enum.ReservationStatus.Cancelled:
+                            statusClass = "outline-danger";
+                            break;
+                        default:
+                            statusClass = "outline-warning";
+                            break;
+                    }
+
+                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden"
+                         style="background-color: var(--bg-secondary); opacity: @opacity; transition: transform 0.2s;">
+                        <div class="row g-0">
+                            <div class="col-md-4 position-relative">
+                                @if (!string.IsNullOrEmpty(booking.ConferenceRoom.ImageUrl))
+                                {
+                                    <img src="@booking.ConferenceRoom.ImageUrl" class="h-100 w-100 object-fit-cover"
+                                         style="min-height: 140px;" alt="Room">
+                                }
+                            </div>
+
+                            <div class="col-md-8">
+                                <div class="card-body h-100 d-flex flex-column justify-content-center">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="fw-bold mb-0 text-truncate" style="color: var(--color-text-title);">
+                                            @booking.ConferenceRoom.Name
+                                        </h5>
+                                        <span class="fw-bold" style="color: var(--color-action-primary);">
+                                            @booking.TotalPrice.ToString("C0")
+                                        </span>
+                                    </div>
+
+                                    <div class="d-flex gap-3 small mb-3">
+                                        <span style="color: var(--color-text-title)">@booking.StartTime.ToLocalTime().ToString("MMM dd, yyyy")</span>
+                                        <span style="color: var(--color-text-title)">@booking.StartTime.ToLocalTime().ToString("HH:mm") - @booking.EndTime.ToLocalTime().ToString("HH:mm")</span>
+                                        <span class="status-outline @statusClass">
+                                            @label
+                                        </span>
+                                    </div>
+
+                                    <div class="mt-auto">
+                                        <a asp-controller="ConferenceRoom" asp-action="Details"
+                                           asp-route-id="@booking.ConferenceRoomId"
+                                           class="small text-decoration-none"
+                                           style="color: var(--color-text-body);">
+                                            View Room Details
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

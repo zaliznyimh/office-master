@@ -1,0 +1,178 @@
+﻿@model OfficeMaster.ViewModels.Rooms.RoomDetailsViewModel
+
+@{
+ViewData["Title"] = Model.Room!.Name;
+}
+
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+
+<div class="container mt-4">
+    <a asp-action="Index" class="btn btn-sm mb-4 fw-bold"
+       style="color: var(--color-text-body); border: 1px solid var(--color-action-sub);">
+        ← Back to List
+    </a>
+
+    <div class="row">
+        <div class="col-lg-8 mb-4">
+
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden mb-4" style="background-color: var(--bg-secondary);">
+                <div style="height: 300px; position: relative;">
+                    @if (!string.IsNullOrEmpty(Model.Room.ImageUrl))
+                    {
+                    <img src="@Model.Room.ImageUrl" class="w-100 h-100 object-fit-cover" alt="@Model.Room.Name">
+                    }
+                    <span class="badge position-absolute top-0 start-0 m-4 px-3 py-2 fs-6"
+                          style="background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);">
+                        @Model.Room.RoomType
+                    </span>
+                </div>
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="fw-bold mb-0" style="color: var(--color-text-title);">@Model.Room.Name</h2>
+                        <div class="text-end">
+                            <span class="fs-4 fw-bold" style="color: var(--color-action-primary);">@Model.Room.PricePerHour.ToString("C0")</span>
+                            <span style="color: var(--color-text-body);">/ hour</span>
+                        </div>
+                    </div>
+                    <p style="color: var(--color-text-body);">@(Model.Room.Description ?? "No description provided.")</p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="amenity-badge">👥 @Model.Room.Capacity People</span>
+                        @if (Model.Room.HasProjector) { <span class="amenity-badge">📽️ Projector</span> }
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-lg rounded-4 p-4" style="background-color: var(--bg-secondary);">
+                <h5 class="fw-bold mb-3" style="color: var(--color-text-title);">Availability Calendar</h5>
+                <p class="small mb-3" style="color: var(--color-text-title)">Click and drag on the calendar to select a time slot.</p>
+                <div id='calendar' style="min-height: 600px;"></div>
+            </div>
+
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-lg rounded-4 sticky-top"
+                 style="background-color: var(--bg-secondary); top: 20px;">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold mb-4" style="color: var(--color-text-title);">Booking Summary</h4>
+
+                    <form asp-action="Book" method="post" id="bookingForm">
+                        <input type="hidden" asp-for="RoomId" />
+                        <input type="hidden" id="pricePerHour" value="@Model.Room.PricePerHour" />
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">Start Time</label>
+                            <input asp-for="StartTime" type="datetime-local" class="form-control" readonly
+                                   style="background-color: var(--bg-main); color: var(--color-text-title); border: 1px solid var(--color-action-sub); color-scheme: dark; opacity: 0.7; pointer-events: none;">
+                            <span asp-validation-for="StartTime" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label text-muted small">End Time</label>
+                            <input asp-for="EndTime" type="datetime-local" class="form-control" readonly
+                                   style="background-color: var(--bg-main); color: var(--color-text-title); border: 1px solid var(--color-action-sub); color-scheme: dark; opacity: 0.7; pointer-events: none;">
+                            <span asp-validation-for="EndTime" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-4 p-3 rounded-3"
+                             style="background-color: var(--bg-main); border: 1px solid var(--color-action-sub);">
+                            <span style="color: var(--color-text-body);">Total Price:</span>
+                            <span id="totalPriceDisplay" class="fs-4 fw-bold" style="color: #4ade80;">$0.00</span>
+                        </div>
+
+                        <button type="submit" id="submitBtn" class="btn btn-primary w-100 py-3 fw-bold fs-5" disabled>
+                            Confirm Booking
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --fc-border-color: var(--color-action-sub);
+        --fc-daygrid-event-dot-width: 5px;
+        --fc-page-bg-color: var(--bg-secondary);
+        --fc-neutral-bg-color: var(--bg-main);
+        --fc-list-event-hover-bg-color: var(--bg-main);
+        --fc-today-bg-color: rgba(255, 255, 255, 0.05);
+    }
+</style>
+
+@section Scripts {
+<partial name="_ValidationScriptsPartial" />
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const calendarEl = document.getElementById('calendar');
+        
+        const startInput = document.getElementById("StartTime");
+        const endInput = document.getElementById("EndTime");
+        const priceDisplay = document.getElementById("totalPriceDisplay");
+        const submitBtn = document.getElementById("submitBtn");
+        
+        let pricePerHour = parseFloat(document.getElementById("pricePerHour").value.replace(',', '.'));
+        
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'timeGridWeek',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'timeGridWeek,timeGridDay'
+            },
+            firstDay: 1,
+            slotMinTime: "08:00:00", 
+            slotMaxTime: "22:00:00",
+            allDaySlot: false,
+            height: 'auto',
+            
+            selectable: true,
+            selectMirror: true,
+            unselectAuto: false,
+
+            events: '@Url.Action("GetRoomEvents", "ConferenceRoom", new { id = Model.Room.Id })',
+
+            select: function(info) {
+                let startStr = toLocalISOString(info.start);
+                let endStr = toLocalISOString(info.end);
+                
+                startInput.value = startStr;
+                endInput.value = endStr;
+                
+                calculatePrice(info.start, info.end);
+            },
+
+            selectAllow: function(selectInfo) {
+                let now = new Date();
+                return selectInfo.start>=now;
+            }
+        });
+        
+        calendar.render();
+
+        function toLocalISOString(date) {
+            const offset = date.getTimezoneOffset() * 60000;
+            return (new Date(date - offset)).toISOString().slice(0, 16);
+        }
+        
+        function calculatePrice(start, end) {
+            const diffMs = end - start;
+            const diffHours = diffMs / (1000 * 60 * 60);
+
+            if (diffHours > 0) {
+                const total = (diffHours * pricePerHour).toFixed(2);
+                priceDisplay.innerText = "$" + total;
+
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Confirm Booking";
+            } else {
+                priceDisplay.innerText = "$0.00";
+                submitBtn.disabled = true;
+            }
+        }
+    });
+</script>
+}

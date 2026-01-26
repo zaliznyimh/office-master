@@ -4,13 +4,6 @@
     ViewData["Title"] = "Registration";
 }
 
-<style>
-    .custom-input::placeholder {
-        color: var(--color-text-body);
-        opacity: 0.5;
-    }
-</style>
-
 <div class="row justify-content-center mt-5">
     <div class="col-md-6">
         <div class="card shadow-lg border-0 rounded-4" style="background-color: var(--bg-secondary);">
@@ -36,7 +29,8 @@
                     
                     <div class="mb-3">
                         <label asp-for="Email" class="form-label" style="color: var(--color-text-body);">Email</label>
-                        <input asp-for="Email" class="form-control" placeholder="name@example.com" />
+                        <input asp-for="Email" class="form-control" placeholder="name@example.com" id="emailInput"/>
+                        <div id="emailFeedback" class="small mt-1 fw-bold"></div>
                         <span asp-validation-for="Email" class="text-danger"></span>
                     </div>
                     
@@ -79,3 +73,41 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const emailInput = document.getElementById("emailInput");
+            const feedbackBox = document.getElementById("emailFeedback");
+            
+            emailInput.addEventListener("blur", async function() {
+                const email = emailInput.value;
+                
+                feedbackBox.textContent = "";
+                emailInput.classList.remove("is-invalid", "is-valid");
+
+                try {
+                    const response = await fetch(`/Account/CheckEmailAvailability?email=${encodeURIComponent(email)}`);
+                    const data = await response.json();
+
+                    if (data.isTaken) {
+                        emailInput.classList.add("is-invalid");
+                        feedbackBox.style.color = "#dc3545";
+                        feedbackBox.textContent = "Email is already taken.";
+                    }
+                } catch (error) {
+                    console.error("Error checking email:", error);
+                }
+            });
+            
+            emailInput.addEventListener("input", function() {
+                if (emailInput.classList.contains("is-invalid")) {
+                    emailInput.classList.remove("is-invalid");
+                    feedbackBox.textContent = "";
+                }
+            });
+        });
+    </script>
+}

@@ -32,8 +32,11 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<IConferenceRoomService, ConferenceRoomService>();
+builder.Services.AddScoped<IProfileService, ProfileService>();
 
 var app = builder.Build();
+
+await DataSeeder.InitializeAsync(app.Services);
 
 if (!app.Environment.IsDevelopment())
 {
