@@ -33,6 +33,8 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<IConferenceRoomService, ConferenceRoomService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<IReservationService, ReservationService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 var app = builder.Build();
 

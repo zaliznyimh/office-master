@@ -115,4 +115,51 @@ public class ConferenceRoomService : IConferenceRoomService
 
         return events;
     }
+
+    public async Task CreateRoomAsync(RoomFormViewModel model)
+    {
+        var room = new ConferenceRoom
+        {
+            Name = model.Name,
+            Description = model.Description,
+            Capacity = model.Capacity,
+            PricePerHour = model.PricePerHour,
+            RoomType = model.RoomType,
+            ImageUrl = model.ImageUrl,
+            HasProjector = model.HasProjector
+        };
+
+        _context.ConferenceRooms.Add(room);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<bool> UpdateRoomAsync(long id, RoomFormViewModel model)
+    {
+        var room = await _context.ConferenceRooms.FindAsync(id);
+        if (room == null) return false;
+        
+        room.Name = model.Name;
+        room.Description = model.Description;
+        room.Capacity = model.Capacity;
+        room.PricePerHour = model.PricePerHour;
+        room.RoomType = model.RoomType;
+        room.ImageUrl = model.ImageUrl;
+        room.HasProjector = model.HasProjector;
+
+        _context.Update(room);
+        await _context.SaveChangesAsync();
+    
+        return true;
+    }
+
+    public async Task<bool> DeleteRoomAsync(long id)
+    {
+        var room = await _context.ConferenceRooms.FindAsync(id);
+        if (room == null) return false;
+
+        _context.ConferenceRooms.Remove(room);
+        await _context.SaveChangesAsync();
+    
+        return true;
+    }
 }

@@ -240,7 +240,7 @@ public static class DataSeeder
                     RoomType = RoomType.ConferenceHall,
                     HasProjector = true,
                     ImageUrl =
-                        "https://images.unsplash.com/photo-1503424886302-fdbd0b6e86b7?auto=format&fit=crop&w=600&q=80"
+                        "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=600&q=80"
                 }
             };
             await context.ConferenceRooms.AddRangeAsync(rooms);

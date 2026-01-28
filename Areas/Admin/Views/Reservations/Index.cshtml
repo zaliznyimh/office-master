@@ -1,0 +1,139 @@
+﻿@model IEnumerable<OfficeMaster.Models.Reservation>
+@using OfficeMaster.Models.Enum 
+
+@{
+    ViewData["Title"] = "All Reservations";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <h3 class="fw-bold text-white mb-4">Manage Reservations</h3>
+
+    <div class="card border-0 shadow-sm mb-4" style="background-color: var(--bg-secondary); border-radius: 12px;">
+        <div class="card-body p-3">
+            <form asp-action="Index" method="get" class="row g-3 align-items-center">
+                
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <input type="text" name="search" class="form-control bg-dark text-white border-secondary" 
+                               placeholder="Search by user or email..." value="@ViewBag.CurrentSearch">
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <select name="status" class="form-select bg-dark text-white border-secondary" 
+                            asp-items="Html.GetEnumSelectList<ReservationStatus>()" onchange="this.form.submit()">
+                        <option value="">All Statuses</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4 text-end">
+                    <button type="submit" class="btn btn-primary fw-bold w-auto">Filter</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary w-auto">Reset</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm" style="background-color: var(--bg-secondary); border-radius: 16px;">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0 rounded-4" style="border-color: var(--color-action-sub);">
+                <thead style="background-color: rgba(0,0,0,0.2);">
+                    <tr>
+                        <th class="ps-4 py-3 text-muted">Status</th>
+                        <th class="py-3 text-muted">User</th>
+                        <th class="py-3 text-muted">Room</th>
+                        <th class="py-3 text-muted">Date & Time</th>
+                        <th class="py-3 text-muted">Price</th>
+                        <th class="pe-4 py-3 text-end text-muted">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                No reservations found matching your criteria.
+                            </td>
+                        </tr>
+                    }
+
+                    @foreach (var reservation in Model)
+                    {
+                        <tr class="hover-row">
+                            <td class="ps-4 py-3">
+                                @switch (reservation.Status)
+                                {
+                                    case ReservationStatus.Approved:
+                                        <span class="badge bg-success bg-opacity-25 text-success px-3 py-2 rounded-pill">Approved</span>
+                                        break;
+                                    case ReservationStatus.Pending:
+                                        <span class="badge bg-warning bg-opacity-25 text-warning px-3 py-2 rounded-pill">Pending</span>
+                                        break;
+                                    case ReservationStatus.Rejected:
+                                        <span class="badge bg-danger bg-opacity-25 text-danger px-3 py-2 rounded-pill">Reject</span>
+                                        break;
+                                    default:
+                                        <span class="badge bg-secondary px-3 py-2 rounded-pill">@reservation.Status</span>
+                                        break;
+                                }
+                            </td>
+
+                            <td class="py-3">
+                                <div class="fw-bold text-black">@reservation.User.FirstName @reservation.User.LastName</div>
+                                <div class="small text-muted">@reservation.User.Email</div>
+                            </td>
+
+
+                            <td class="py-3">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="rounded-3 overflow-hidden" style="width: 30px; height: 30px;">
+                                        @if(!string.IsNullOrEmpty(reservation.ConferenceRoom.ImageUrl))
+                                        {
+                                            <img src="@reservation.ConferenceRoom.ImageUrl" class="w-100 h-100 object-fit-cover" 
+                                                 alt="@reservation.ConferenceRoom.Name image">
+                                        }
+                                    </div>
+                                    <span class="text-black">@reservation.ConferenceRoom.Name</span>
+                                </div>
+                            </td>
+
+                            <td class="py-3">
+                                <div class="text-black">@reservation.StartTime.ToString("MMM dd, yyyy")</div>
+                                <div class="small text-muted">
+                                    @reservation.StartTime.ToString("HH:mm") - @reservation.EndTime.ToString("HH:mm")
+                                </div>
+                            </td>
+
+                            <td class="py-3 text-success fw-bold">
+                                @reservation.TotalPrice.ToString("C0")
+                            </td>
+
+                            <td class="pe-4 py-3 text-end">
+                                @if (reservation.Status == ReservationStatus.Pending)
+                                {
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <form asp-action="Approve" asp-route-id="@reservation.Id" method="post">
+                                            <button type="submit" class="btn btn-sm btn-success" title="Approve">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </form>
+                                        <form asp-action="Decline" asp-route-id="@reservation.Id" method="post">
+                                            <button type="submit" class="btn btn-sm btn-danger" title="Reject">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">Processed</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

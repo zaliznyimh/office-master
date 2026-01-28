@@ -1,0 +1,86 @@
+﻿@model OfficeMaster.ViewModels.Rooms.RoomFormViewModel
+@using OfficeMaster.Models.Enum
+
+@{
+    ViewData["Title"] = "Create Room";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container d-flex flex-column align-items-center">
+    
+    <div style="width: 100%; max-width: 550px;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="fw-bold text-white">Create New Room</h3>
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Cancel</a>
+        </div>
+
+        <div class="card border-0 shadow-lg" style="background-color: var(--bg-secondary); border-radius: 16px;">
+            <div class="card-body p-4">
+                <form asp-action="Create" method="post">
+                    
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold" style="color: var(--color-action-primary)">Room Name</label>
+                        <input asp-for="Name" class="form-control bg-white text-black border-0" placeholder="e.g. Main Hall"/>
+                        <span asp-validation-for="Name" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label small fw-bold" style="color: var(--color-action-primary)">Price / Hour</label>
+                            <input asp-for="PricePerHour" type="number" class="form-control bg-white text-black border-0" />
+                            <span asp-validation-for="PricePerHour" class="text-danger small"></span>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label small fw-bold" style="color: var(--color-action-primary)">Capacity</label>
+                            <input asp-for="Capacity" class="form-control bg-white text-black border-0"/>
+                            <span asp-validation-for="Capacity" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold" style="color: var(--color-action-primary)">Room Type</label>
+                        <select asp-for="RoomType"
+                                asp-items="Html.GetEnumSelectList<RoomType>()"
+                                class="form-select bg-white text-black border-0">
+                        </select>
+                        <span asp-validation-for="RoomType" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold" style="color: var(--color-action-primary)">Description</label>
+                        <textarea asp-for="Description" class="form-control bg-white text-black border-0" rows="4"></textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold" style="color: var(--color-action-primary)">Image URL</label>
+                        <input asp-for="ImageUrl" class="form-control bg-white text-black border-0"
+                               placeholder="https://example.com/image.jpg"/>
+                        <span asp-validation-for="ImageUrl" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold mb-2" style="color: var(--color-text-title)">Amenities</label>
+                        <div class="card border-0 p-3" style="background-color: white;">
+                            <div class="form-check form-switch m-0">
+                                <input class="form-check-input bg-primary" type="checkbox" asp-for="HasProjector" style="cursor: pointer;">
+                                <label class="form-check-label text-black fw-bold" asp-for="HasProjector" style="cursor: pointer;">
+                                    Projector
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary fw-bold py-2 fs-6">
+                            Create Room
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial"/>
+}
