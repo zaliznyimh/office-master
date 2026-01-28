@@ -7,6 +7,14 @@
   --color-text-body: #a4a3ad;
   --color-action-primary: #fffcfb;
   --color-action-sub: #525875;
+
+  /* FullCalendar.js styles */
+  --fc-border-color: var(--color-action-sub);
+  --fc-daygrid-event-dot-width: 5px;
+  --fc-page-bg-color: var(--bg-secondary);
+  --fc-neutral-bg-color: var(--bg-main);
+  --fc-list-event-hover-bg-color: var(--bg-main);
+  --fc-today-bg-color: rgba(255, 255, 255, 0.05);
 }
 
 body {
@@ -102,7 +110,7 @@ body {
   box-shadow: none;
 }
 
-input::placeholder {
+input[type=text]::placeholder {
   color: var(--color-text-body);
 }
 
@@ -138,7 +146,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
   background-color: transparent;
   border: 1px solid;
 }

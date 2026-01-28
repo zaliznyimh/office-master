@@ -15,4 +15,8 @@ public interface IConferenceRoomService
     Task<bool> IsRoomAvailableAsync(long roomId, DateTime start, DateTime end);
     Task<bool> BookRoomAsync(ConferenceRoom room, long userId, RoomDetailsViewModel model);
     Task<List<CalendarResponse>> GetConferenceRoomCalendar(long roomId);
+    
+    Task CreateRoomAsync(RoomFormViewModel model);
+    Task<bool> UpdateRoomAsync(long id, RoomFormViewModel model);
+    Task<bool> DeleteRoomAsync(long id);
 }

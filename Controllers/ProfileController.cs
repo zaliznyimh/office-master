@@ -41,26 +41,18 @@ public class ProfileController : Controller
     [HttpPost]
     public async Task<IActionResult> Update(ProfileViewModel model)
     {
-        var user = await _userManager.GetUserAsync(User);
-        if (user == null) return RedirectToAction("Login", "Account");
-        
-        if (!ModelState.IsValid)
+        if (!long.TryParse(_userManager.GetUserId(User), out var userId) || userId <= 0)
         {
-            model.MyReservations = await _profileService.GetUserReservations(user.Id);
-            return View("Index", model);
-        }
-        
-        user.FirstName = model.FirstName;
-        user.LastName = model.LastName;
-        user.CompanyName = model.CompanyName ?? string.Empty;
-        user.Email = model.Email;
-        
-        if (model.DateOfBirth.HasValue)
-        {
-            user.DateOfBirth = DateTime.SpecifyKind(model.DateOfBirth.Value, DateTimeKind.Utc);
+            return RedirectToAction("Login", "Account");
         }
 
-        var result = await _userManager.UpdateAsync(user);
+        if (!ModelState.IsValid)
+        {
+            model.MyReservations = await _profileService.GetUserReservations(userId);
+            return View("Index", model);
+        }
+
+        var result = await _profileService.UpdateUserProfileAsync(userId, model);
 
         if (result.Succeeded)
         {
@@ -70,9 +62,10 @@ public class ProfileController : Controller
 
         foreach (var error in result.Errors)
         {
-            ModelState.AddModelError("", error.Description);
+            ModelState.AddModelError(string.Empty, error.Description);
         }
 
+        model.MyReservations = await _profileService.GetUserReservations(userId);
         return View("Index", model);
     }
 }
